@@ -1,0 +1,32 @@
+h1, h2, p, label, button, input {font-family: 'Kanit', sans-serif;}
+.container {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr ;
+    grid-template-rows: 0.4fr 2.1fr auto auto auto auto auto 1fr;
+    gap: 10px 10px;
+
+    grid-auto-flow: row;
+    grid-template-areas:
+      ". . ."
+      "topFrame topFrame ."
+      "tableFrame tableFrame tableFrame"
+      "newFrame newFrame newFrame"
+      "amountFrame . categoryFrame"
+      ". descFrame ."
+      ". submitFrame ."
+      ". . .";
+  }
+  
+  .topFrame { grid-area: topFrame; }
+  
+  .tableFrame { grid-area: tableFrame; }
+
+  .newFrame { grid-area: newFrame; }
+
+  .amountFrame { grid-area: amountFrame; }
+
+  .categoryFrame { grid-area: categoryFrame; }
+
+  .descFrame { grid-area: descFrame; }
+
+  .submitFrame { grid-area: submitFrame; }

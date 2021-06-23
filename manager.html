@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Spectre Reimbursement Management</title>
+    <link rel="stylesheet" href="managerLayout.css"
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Kanit&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-+0n0xVW2eSR5OomGNYDnhzAbDsOXxcvSN1TPprVMTNDbiYZCxYbOOl7+AMvyTG2x" crossorigin="anonymous">
+</head>
+<body style="background-image: url('mass-effect-background.jpg'); background-repeat: no-repeat; background-attachment: fixed; background-size: 100% 100%">
+    
+    <div class="container">
+        <div class="topFrame">
+            <h1 id="welcomeHeader" style="color:white; text-align:left">WELCOME</h1>
+        </div>
+        <div class="tableFrame" style="background-color:rgb(27, 140, 140)">
+            <table class="table table-striped">
+                <thead><th style="color:white">CREDITS</th><th style="color:white">CATEGORY</th><th style="color:white">EMPLOYEE</th><th style="color:white"></th></thead>
+                <tbody id="tableBody"></tbody>
+            </table>
+        </div>
+        <div class="descFrame">
+            <h2 style='color:white; text-align:left'>DESCRIPTION:</h2>
+            <p id='descriptionBox' style='color:white; text-align:left; background-color:rgb(27, 140, 140)'>Select a reimbursement to see description</p>
+        </div>
+        <div class="reasonFrame">
+            <h2 style='color:white; text-align:left'>REASON:</h2>
+            <textarea id="reasonArea" rows="2" cols="60" style='color:white; background-color:rgb(94, 131, 242)'></textarea>
+        </div>
+        <div class="statsFrame">
+            <button id="statsButton" onclick="gotoStats()" style="color:white; background-color:rgb(7, 26, 38)">Stats</button>
+        </div>
+        <div class="denyFrame">
+            <button id="denyButton" onclick="handle('deny')" style="color:white; background-color:rgb(7, 26, 38)">Deny</button>
+        </div>
+        <div class="approveFrame">
+            <button id="approveButton" onclick="handle('approve')" style="color:white; background-color:rgb(7, 26, 38)">Approve</button>
+        </div>
+    </div>
+
+</body>
+<script>
+
+    const welcomeHeader = document.getElementById("welcomeHeader");
+    const descriptionBox = document.getElementById("descriptionBox");
+    const reasonArea = document.getElementById("reasonArea");
+    const tableBody = document.getElementById("tableBody")
+    
+    start();
+
+    async function start() {
+        employee = await getEmployee();
+        welcomeHeader.innerHTML = `WELCOME ${employee.firstName.toUpperCase()}`;
+        getReimbursements();
+    }
+
+    async function getReimbursements() {
+        const response = await fetch(`http://localhost:5000/employees/${employee.employeeId}/reimbursements/pending`);
+        const reimbursements = await response.json();
+        let innerRows = "";
+        for (let reimbursement of reimbursements){
+            innerRows += `<tr>
+                <td style='color:white'>${reimbursement.credits}</td>
+                <td style='color:white'>${getCat(reimbursement.category)}</td>
+                <td style='color:white'>${await getEmpName(reimbursement.eId)}</td>
+                <td><button style='color:white; background-color:rgb(7, 26, 38)' onclick='selectReimbursement(${reimbursement.rId})'>SELECT</button></td>
+                </tr>`;
+        }
+        tableBody.innerHTML = innerRows;
+    }
+
+    function gotoStats() {
+        window.location.href = `stats.html?id=${employee.employeeId}`;
+    }
+
+    async function handle(status) {
+        let reimb = null;
+        if (status === "deny") {
+            reimb = {
+                rId:selected.rId,
+                credits:selected.credits,
+                category:selected.category,
+                description:selected.description,
+                approved:false,
+                reason:reasonArea.value,
+                mId:employee.employeeId,
+                eId:selected.eId
+            }
+        } else {
+            reimb = {
+                rId:selected.rId,
+                credits:selected.credits,
+                category:selected.category,
+                description:selected.description,
+                approved:true,
+                reason:reasonArea.value,
+                mId:employee.employeeId,
+                eId:selected.eId
+            }
+        }
+
+        const config = {
+            method:"PUT",
+            headers:{'Content-Type':'application/json'},
+            body:JSON.stringify(reimb)
+        }
+
+        const response = await fetch(`http://localhost:5000/employees/${employee.employeeId}/reimbursements/${selected.rId}`, config);
+        if (response.status === 201) {
+            alert("Reimbursement successfully updated");
+            getReimbursements();
+        } else {
+            alert("Reimbursement update failed");
+        }
+    }
+
+    async function selectReimbursement(rId) {
+        const response = await fetch(`http://localhost:5000/employees/${employee.employeeId}/reimbursements/${rId}`);
+        selected = await response.json();
+
+        descriptionBox.innerHTML = selected.description;
+    }
+
+    async function getEmpName(eId) {
+        const response = await fetch(`http://localhost:5000/employees/${eId}`);
+        const employee = await response.json();
+        return employee.firstName + ' ' + employee.lastName;
+    }
+
+    function getCat(cat) {
+        if (parseInt(cat) === 1) {
+            return "Fuel";
+        } else if (parseInt(cat) === 2) {
+            return "Food";
+        } else if (parseInt(cat) === 3) {
+            return "Accommodations";
+        } else if (parseInt(cat) === 4) {
+            return "Repairs/Replacements";
+        } else if (parseInt(cat) === 5) {
+            return "Equipment";
+        } else if (parseInt(cat) === 6) {
+            return "Training/Certifications";
+        } else if (parseInt(cat) === 7) {
+            return "Clients/Recruitment";
+        } else {
+            return "Other";
+        }
+    }
+
+    async function getEmployee(){
+        const queryString = window.location.search;
+        const urlParams = new URLSearchParams(queryString);
+        const employeeId = urlParams.get('id');
+        const response = await fetch(`http://localhost:5000/employees/${employeeId}`);
+        const emp = await response.json();
+        return emp;
+    }
+
+</script>
+</html>

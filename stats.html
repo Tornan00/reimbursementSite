@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Reimbursement Statistics</title>
+    <link rel="stylesheet" href="statsLayout.css"
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Kanit&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-+0n0xVW2eSR5OomGNYDnhzAbDsOXxcvSN1TPprVMTNDbiYZCxYbOOl7+AMvyTG2x" crossorigin="anonymous">
+</head>
+<body style="background-image: url('mass-effect-background.jpg'); background-repeat: no-repeat; background-attachment: fixed; background-size: 100% 100%"">
+    <div class="container">
+        <div class="topFrame">
+            <h1 style="color:white; text-align:center">STATISTICS</h1>
+            <p style="color:white; text-align:center">Total amount of credits requested for reimbursement by each Spectre for each category. 
+            Average is average credit amount for a request of that category.</p>
+        </div>
+        <div class="tableFrame" style="background-color:rgb(27, 140, 140)">
+            <table class="table table-striped">
+                <thead>
+                    <th style="color:white; text-align:center"></th>
+                    <th style="color:white; text-align:center">FUEL</th>
+                    <th style="color:white; text-align:center">FOOD</th>
+                    <th style="color:white; text-align:center">ACCOMMODATIONS</th>
+                    <th style="color:white; text-align:center">REPAIRS/REPAIRS</th>
+                    <th style="color:white; text-align:center">EQUIPMENT</th>
+                    <th style="color:white; text-align:center">TRAINING/CERTIFICATIONS</th>
+                    <th style="color:white; text-align:center">CLIENTS/RECRUITMENT</th>
+                    <th style="color:white; text-align:center">OTHER</th>
+                </thead>
+                <tbody id="tableBody"></tbody>
+            </table>
+        </div>
+        <div class="backFrame">
+            <button onclick="goBack()" style="color:white; background-color:rgb(7, 26, 38)">Back</button>
+        </div>
+    </div>
+</body>
+<script>
+
+    const tableBody = document.getElementById("tableBody")
+    
+    start();
+
+    async function start() {
+        employee = await getEmployee();
+        getStats();
+    }
+
+    async function getStats() {
+        const response = await fetch(`http://localhost:5000/employees/${employee.employeeId}/reimbursements/stats`);
+        const stats = await response.json();
+        console.log(stats)
+        innerRows = "";
+        for (let stat of stats){
+            innerRows += `<tr>
+                <td style='color:white; text-align:center'>${stat.name}</td>
+                <td style='color:white; text-align:center'>${stat[1]}</td>
+                <td style='color:white; text-align:center'>${stat[2]}</td>
+                <td style='color:white; text-align:center'>${stat[3]}</td>
+                <td style='color:white; text-align:center'>${stat[4]}</td>
+                <td style='color:white; text-align:center'>${stat[5]}</td>
+                <td style='color:white; text-align:center'>${stat[6]}</td>
+                <td style='color:white; text-align:center'>${stat[7]}</td>
+                <td style='color:white; text-align:center'>${stat[8]}</td>
+                </tr>`;
+        }
+        tableBody.innerHTML = innerRows;
+    }
+
+    function goBack() {
+        window.location.href = `manager.html?id=${employee.employeeId}`;
+    }
+
+    async function getEmployee(){
+        const queryString = window.location.search;
+        const urlParams = new URLSearchParams(queryString);
+        const employeeId = urlParams.get('id');
+        const response = await fetch(`http://localhost:5000/employees/${employeeId}`);
+        const emp = await response.json();
+        return emp;
+    }
+
+</script>
+</html>

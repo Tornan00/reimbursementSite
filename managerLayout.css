@@ -1,0 +1,32 @@
+h1, h2, p, label, button, input {font-family: 'Kanit', sans-serif;}
+.container {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr ;
+    grid-template-rows: 0.4fr 2.1fr auto 2fr 2fr 2fr 1fr;
+    gap: 10px 10px;
+
+    grid-auto-flow: row;
+    grid-template-areas:
+      ". . ."
+      "topFrame topFrame ."
+      "tableFrame tableFrame tableFrame"
+      "descFrame descFrame descFrame"
+      "reasonFrame reasonFrame reasonFrame"
+      "statsFrame denyFrame approveFrame"
+      ". . .";
+  }
+  
+  .topFrame { grid-area: topFrame; }
+  
+  .tableFrame { grid-area: tableFrame; }
+
+  .descFrame { grid-area: descFrame; }
+
+  .reasonFrame { grid-area: reasonFrame; }
+
+  .statsFrame { grid-area: statsFrame; }
+
+  .denyFrame { grid-area: denyFrame; }
+
+  .approveFrame { grid-area: approveFrame; }
+  

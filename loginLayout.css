@@ -1,0 +1,32 @@
+h1, p, label, button, input {font-family: 'Kanit', sans-serif;}
+.container {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+    grid-template-rows: 1fr 2.1fr auto auto auto auto auto 1fr;
+    gap: 10px 10px;
+    align-items: center;
+    justify-items: center;
+    grid-auto-flow: row;
+    grid-template-areas:
+      ". . . ."
+      "topFrame topFrame topFrame topFrame"
+      ". mainFrame mainFrame ."
+      ". secondFrame secondFrame ."
+      ". buttonFrame buttonFrame ."
+      ". wrongFrame wrongFrame ."
+      ". imageFrame imageFrame ."
+      ". . . .";
+  }
+  
+  .topFrame { grid-area: topFrame; }
+  
+  .mainFrame { grid-area: mainFrame; }
+
+  .secondFrame { grid-area: secondFrame; }
+
+  .buttonFrame { grid-area: buttonFrame; }
+
+  .wrongFrame { grid-area: wrongFrame; }
+
+  .imageFrame { grid-area: imageFrame; }
+  
